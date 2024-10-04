@@ -8,8 +8,11 @@ from flask_cors import CORS
 from models import db,UserModel
 from resources.user import Login,User
 from resources.recipe import Recipe
+from dotenv import load_dotenv
+import os
 
-
+# Load environment variables from the .env file
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
@@ -17,10 +20,11 @@ api = Api(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# Configuring app using environment variables
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', False)
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 
-app.config["JWT_SECRET_KEY"] = "super-secret" 
 
 # Initialize the database
 db.init_app(app)
@@ -38,4 +42,4 @@ api.add_resource(Recipe, '/recipes', '/recipes/<int:id>')
 api.add_resource(Login, '/login')
 
 if __name__ == '__main__':
-    app.run(port=5000,debug=True)
+    app.run(port=5000,debug=False)
